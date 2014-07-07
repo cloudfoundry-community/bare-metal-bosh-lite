@@ -1,4 +1,4 @@
-# Deploy bosh-lite on bare-metal using knife solo
+# Bosh-lite on bare-metal with knife solo
 
 This guide assumes you have already installed [Ubuntu Server 12.04 LTS (64-bit)](http://releases.ubuntu.com/12.04.4/) on your box.
 And have correctly configured ssh access.
