@@ -1,7 +1,8 @@
 {
   "run_list": [
       "bosh-lite::warden",
-      "bosh-lite::bosh"
+      "bosh-lite::bosh",
+      "bare-metal-bosh-lite"
   ],
   "boshlite": { 
       "enable_compiled_package_cache": true,
