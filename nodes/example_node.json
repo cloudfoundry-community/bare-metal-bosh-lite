@@ -5,6 +5,6 @@
   ],
   "boshlite": { 
       "enable_compiled_package_cache": true,
-      "director_ip": STATIC_IP
+      "director_ip": "STATIC_IP"
   }
 }
