@@ -3,6 +3,10 @@
 # Recipe:: default
 #
 
+user 'vagrant' do
+  action :nothing
+end.run_action(:create)
+
 ip = node['ipaddress']
 %w[80 443 4443].each do |port| 
   iptables_ng_rule "web-#{port}" do
