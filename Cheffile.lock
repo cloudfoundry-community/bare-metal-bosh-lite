@@ -42,6 +42,11 @@ SITE
       apt (>= 1.9.0)
       build-essential (>= 0.0.0)
       openssl (>= 0.0.0)
+    rbenv (1.7.1)
+      apt (>= 0.0.0)
+      build-essential (>= 0.0.0)
+      git (>= 0.0.0)
+      ohai (>= 1.1)
     rsyslog (1.12.2)
     runit (1.5.10)
       build-essential (>= 0.0.0)
@@ -60,7 +65,7 @@ GIT
   remote: https://github.com/cloudfoundry/bosh-lite
   path: site-cookbooks
   ref: master
-  sha: f840131056655f2f403e5d4bfded6fe067260648
+  sha: f862e7554f4f820f4f1a5e49e8153f224a853ac0
   specs:
     bosh-lite (0.1)
       apt (>= 0.0.0)
@@ -71,16 +76,6 @@ GIT
       openssl (>= 0.0.0)
       postgresql (>= 0.0.0)
       rbenv (>= 0.0.0)
-
-GIT
-  remote: https://github.com/cloudfoundry/rbenv-cookbook.git
-  ref: master
-  sha: f923e0eea6f4da8bf27a6d459c0433223439d4ee
-  specs:
-    rbenv (1.4.2)
-      build-essential (>= 0.0.0)
-      git (>= 0.0.0)
-      ohai (>= 1.1)
 
 DEPENDENCIES
   apt (>= 0)
