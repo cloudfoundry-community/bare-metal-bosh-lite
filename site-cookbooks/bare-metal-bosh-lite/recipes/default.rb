@@ -8,20 +8,10 @@ user 'vagrant' do
   action :nothing
 end.run_action(:create)
 
-# %w[default forward prerouting].each do |chain|
-#   iptables_ng_chain "warden-#{chain}"
-# end
 
-
-# ip = node['ipaddress']
-# %w[80 443 4443].each do |port| 
-#   iptables_ng_rule "web-#{port}" do
-#     ip_version 4
-#     chain 'PREROUTING'
-#     table 'nat'
-#     rule "-p tcp -d #{ip} --dport #{port} -j DNAT --to 10.244.0.34:#{port}"
-#   end
-# end
+cookbook_file "/etc/network/interfaces" do
+  notifies :run, 'execute[restart-network]'
+end
 
 # xip.io is not supported by all dns server use google to be save
 ruby_block "setup-google-dns" do
@@ -32,10 +22,10 @@ ruby_block "setup-google-dns" do
     file.write_file
   end
   action :create
-  notifies :run, 'execute[apply-dns]'
+  notifies :run, 'execute[restart-network]'
 end
 
-execute "apply-dns" do
-  command "ifdown eth0 && ifup eth0"
+execute "restart-network" do
+  command "ifdown -a && ifup -a"
   action :nothing
 end

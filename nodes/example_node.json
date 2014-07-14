@@ -5,8 +5,7 @@
       "bare-metal-bosh-lite"
   ],
   "boshlite": { 
-      "enable_compiled_package_cache": true,
-      "director_ip": "STATIC_IP"
+      "enable_compiled_package_cache": true
   },
   "build_essential": {
     "compiletime": true

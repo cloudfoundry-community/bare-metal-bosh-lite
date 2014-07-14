@@ -13,7 +13,7 @@ knife solo prepare root@$STATIC_IP
 2. Edit the created node file
 
 ```
-sed "s/STATIC_IP/$STATIC_IP/g" nodes/example_node.json > nodes/$STATIC_IP.json
+cp nodes/example_node.json nodes/$STATIC_IP.json
 ```
 
 3. Install bosh-lite
