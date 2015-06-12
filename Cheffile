@@ -1,4 +1,4 @@
-site "http://community.opscode.com/api/v1"
+site "https://supermarket.getchef.com/api/v1"
 
 # Imported from: https://github.com/cloudfoundry/bosh-lite/blob/master/Cheffile
 cookbook 'apt'
