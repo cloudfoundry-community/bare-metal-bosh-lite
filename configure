@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [[ -z ${SERVER_IP} || -z ${SSH_KEY} ]]; then echo
+	echo "USAGE: SERVER_IP=<ip> SSH_KEY=<ssh key path> ./configure"
+	echo
+	echo To override BOSH or Warden CPI versions, use the BOSH_VERSION and WARDEN_CPI_VERSION variables
+	exit -1
+fi
+
+if [[ ! $(vagrant plugin list | grep vagrant-bosh) ]]; then
+	vagrant plugin install vagrant-bosh
+fi
+if [[ ! $(vagrant plugin list | grep vagrant-managed-servers) ]]; then
+	vagrant plugin install vagrant-managed-servers
+fi
+
+set -e
+
+bundle
+
+BOSH_VERSION=${BOSH_VERSION:-196}
+WARDEN_CPI_VERSION=${WARDEN_CPI_VERSION:-21}
+
+sed \
+	-e "s|YOUR_SERVER_IP|${SERVER_IP}|g" \
+	-e "s|PATH_TO_SSH_KEY|${SSH_KEY}|g" \
+	Vagrantfile.example > Vagrantfile
+
+sed \
+	-e "s|BOSH_VERSION|${BOSH_VERSION}|g" \
+	-e "s|WARDEN_CPI_VERSION|${WARDEN_CPI_VERSION}|g" \
+	bare-metal.yml.example > bare-metal.yml
+
+echo 'Configured! Run `vagrant up` and `vagrant provision` next.'
