@@ -4,11 +4,11 @@ name: bosh-lite
 
 releases:
 - name: bosh
-  version: BOSH_VERSION
-  url: http://bosh.io/d/github.com/cloudfoundry/bosh?v=BOSH_VERSION
+  version: 161
+  url: http://bosh.io/d/github.com/cloudfoundry/bosh?v=161
 - name: bosh-warden-cpi
-  version: WARDEN_CPI_VERSION
-  url: http://bosh.io/d/github.com/cppforlife/bosh-warden-cpi-release?v=WARDEN_CPI_VERSION
+  version: 21
+  url: http://bosh.io/d/github.com/cppforlife/bosh-warden-cpi-release?v=21
 
 networks:
 - {name: default, type: dynamic}
