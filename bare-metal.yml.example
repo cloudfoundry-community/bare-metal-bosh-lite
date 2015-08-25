@@ -1,0 +1,183 @@
+---
+
+name: bosh-lite
+
+releases:
+- name: bosh
+  version: 161
+  url: http://bosh.io/d/github.com/cloudfoundry/bosh?v=161
+- name: bosh-warden-cpi
+  version: 21
+  url: http://bosh.io/d/github.com/cppforlife/bosh-warden-cpi-release?v=21
+
+networks:
+- {name: default, type: dynamic}
+
+update:
+  canary_watch_time: 5000 - 600000
+  update_watch_time: 5000 - 600000
+
+compilation:
+  network: default
+
+jobs:
+- name: bosh
+  instances: 1
+
+  networks:
+  - name: default
+
+  templates:
+  - {name: nats, release: bosh}
+  - {name: redis, release: bosh}
+  - {name: blobstore, release: bosh}
+  - {name: postgres, release: bosh}
+  - {name: director, release: bosh}
+  - {name: health_monitor, release: bosh}
+  - {name: cpi, release: bosh-warden-cpi}
+  - {name: warden, release: bosh-warden-cpi}
+
+properties:
+  ntp: ["0.us.pool.ntp.org"]
+
+  compiled_package_cache:
+    provider: local
+    options: {blobstore_path: /vagrant/tmp/compiled_package_cache}
+
+  nats:
+    user: nats
+    password: nats-password
+    address: 127.0.0.1
+    port: 4222
+
+  blobstore:
+    address: 127.0.0.1
+    port: 25251
+    backend_port: 25552
+    agent: {user: agent, password: agent-password}
+    director: {user: director, password: director-password}
+
+  postgres: &db
+    user: bosh
+    password: bosh-password
+    host: 127.0.0.1
+    port: 5432
+    database: bosh
+
+  redis:
+    password: redis-password
+    address: 127.0.0.1
+    port: 25255
+
+  director:
+    name: "Bosh Lite Director"
+    address: 127.0.0.1
+    max_tasks: 100
+    cpi_job: cpi
+    db: *db
+
+    # Compatibility with current garden networking manifest config
+    ignore_missing_gateway: 1
+
+    # From https://github.com/cppforlife/turbulence-release/blob/master/ca/generate.sh
+    ssl:
+      key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpQIBAAKCAQEA6LlOQbGpTRwS1FmFcSpBKReUxeNivKMumRTJjO/Nn9IPSz4a
+        zvY9oCk3DcLMHT56T+Ofo2+WPNbq+3w9TCr4OV7W4bqsEQErkCY0C0v5cE/sFQ/v
+        gUD5XrOmeWdRhuOuxGZuaUkfrXiePqp2nnC6MbENwKpNGTpHIMr5YsSFMtVZcOXh
+        s6D6zx77CDBNtoM45DflBWGIorX5ypZ/wqe0ovbC24qKt/Dobn9ZraSA82iNFMK7
+        REfkDw77Xfbjjnc5dmllx8QhOHcA+nSEazGYXgiKBEOifglbu5IuHbqimDz54Q6h
+        Knkb8ybHFe80K2Ol2bPYMzcqw6FAlS5dUGUjgwIDAQABAoIBAQDMbeLpYEfo/W0o
+        7c6DfuuoTheY0UptjCalwBXgYNJOvvZCUTa5cKLnquy6gNBOLBDDVp9nsODXZq8Z
+        5KPv4ZsUwlOeDB2T/mQnBvgWqFFgMESgp9PqxYmIf+UPpgt+o0hlK9l3UQ2rk1Xm
+        lFUIjttwRShggvig3YmXq9TvxtN+tzAgvXD1OBQwIIOzWApjV24qiseiVB35gJnG
+        jWxmEPiXTnrKL2/7t7ix/eRGRyogdCmK9T3CLgh3TRMO0JNtU9nMNmoIIuvtWIlX
+        33512r5TnnB3u5vGAlB193ZselPNVpKpXmPVgZ6vSs3gFXxmqEvZAFXq5yhKsyRh
+        3Mu17RBhAoGBAPmcBZ5P92wIQ+zNUMDepADLICxyc8SegBHX4FF4b+jRHaM6LbMd
+        DMWWdEM5V6iR3S5kjc0CwIXwIJnAgoIIOQmYHc4R0mDwZEu0gIYKplIDNvgMA4MK
+        G9iVziWRIlnqcNF6Xax3HQ5DlcvIJo2U34Vng/UfYkUWkO6RcEyg58exAoGBAO6u
+        nOdlBwBzS+Y474GxffpWBN68eOR+Ty0aySEG+uleIvwvoj9pTSRTdCt0uaGBGjKn
+        ukQT/DW7sE5qAsI8EYSX+fuw43RIrQBcWRz/GqGUfHvof9ttRBp9bTYraQs9CZBv
+        ZwEJX2xeRqXHP1/sMLOqioAm7Q930eCkePxGmB9zAoGBAPYkwHmcW94hzHHRCegX
+        5VyO8lxCRR1IO/zch+1vOdQ5muNitLwjUnvqYR4FhwbJSHa+XAMlypqJ8GwOJeR6
+        nVxzsDiM5IwJoq3xAqisCdVoLCWxGyl2p30ORSpQk7JdeQFpjMRM9c8iIK7C4hnO
+        DBmuubbYSvzcQvGvZDF8nvQRAoGAGJ+I7lI8064RUXHkO4P9FBtVq0jUS/Y/4s5V
+        m4Ol1PdyMoQTf+k0HSBC5szG7cNs2Xb2P1m0djKjsKM9H56kzAIFtxJ7lJ5+wn/E
+        bbpfm/W+leXZcuCl2vm/j4wQ7Sjh2LW1caTu5DYhoa6ZeiLar15TpX7ei+73hu5Q
+        0O3TecMCgYEAj7LQJhRhzl3OI4HWFOZCTjxihqhQOoH5tyNoKxFmw4iBI6O3PTFu
+        U+K0cVeS3mmz5BPYFNtOhcE8Olc8MlsHexDPqfVUwLCCA4TZyYI43vYOYUgvF8Xa
+        MsiAO/c/aTeUi7bH9LZc900pFXht9zmFI776GroSBQ7fFEe6yEX91Bc=
+        -----END RSA PRIVATE KEY-----
+      # subject=/C=US/O=BOSH/CN=192.168.50.4
+      cert: |
+        -----BEGIN CERTIFICATE-----
+        MIIDEDCCAfigAwIBAgIJANy2vEpugwXtMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+        BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+        aWRnaXRzIFB0eSBMdGQwIBcNMTUwNzEyMDIzNTA4WhgPMjI4OTA0MjUwMjM1MDha
+        MDMxCzAJBgNVBAYTAlVTMQ0wCwYDVQQKEwRCT1NIMRUwEwYDVQQDEwwxOTIuMTY4
+        LjUwLjQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDouU5BsalNHBLU
+        WYVxKkEpF5TF42K8oy6ZFMmM782f0g9LPhrO9j2gKTcNwswdPnpP45+jb5Y81ur7
+        fD1MKvg5XtbhuqwRASuQJjQLS/lwT+wVD++BQPles6Z5Z1GG467EZm5pSR+teJ4+
+        qnaecLoxsQ3Aqk0ZOkcgyvlixIUy1Vlw5eGzoPrPHvsIME22gzjkN+UFYYiitfnK
+        ln/Cp7Si9sLbioq38Ohuf1mtpIDzaI0UwrtER+QPDvtd9uOOdzl2aWXHxCE4dwD6
+        dIRrMZheCIoEQ6J+CVu7ki4duqKYPPnhDqEqeRvzJscV7zQrY6XZs9gzNyrDoUCV
+        Ll1QZSODAgMBAAGjEzARMA8GA1UdEQQIMAaHBMCoMgQwDQYJKoZIhvcNAQEFBQAD
+        ggEBAEt472rlr3dDh2zRotqLAGSYn1MlQpqeY1ptvfCFUNlzIibdU+H6lUsX/ZOy
+        jzBihUkjXSdwVmbs/sq+wNdW3en10vjlfiPhBaN9j65t7xB+NmrssUGya/6MXcSW
+        G1kgleLstp/DuqmiXA51mWbqm67djVcpBLE9nC0OQLCfzRJmceO950z7Ip8zY1mp
+        fB72jCN7+fU2pxSacJfrEN+dPE5EP6ACJBUdGPivEDWgfFdy5VjlmBZyOPf87MbK
+        HhrbjIgLWhoznfjQkVlHA3tz4Xtu8zpPpalF5tJDV8QpOooJTeBktFT+O3fS9DbR
+        juw7YrkZ61ino5Rvd1lQEOQAZJs=
+        -----END CERTIFICATE-----
+      # Not used by the Director
+      ca_cert: |
+        -----BEGIN CERTIFICATE-----
+        MIIDtzCCAp+gAwIBAgIJAL+XoGqlINOLMA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+        BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+        aWRnaXRzIFB0eSBMdGQwIBcNMTUwNzEyMDIzNTA4WhgPMjI4OTA0MjUwMjM1MDha
+        MEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJ
+        bnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
+        ggEKAoIBAQDOGrPb3jitQZBPqJYC2/1rrpXO6cQF4hQV6CPajFnTYI2TmoKVrPpt
+        hbJVbcWC4VopmfVrq2YLkP28L25QEtNCg8QBJOa5jLPCDzffasA40YUqrMMWOh0b
+        JqzXKgtc4u0FffHBSXq3csyQXNeB/UG6qk/0YuJCFYY5zVAnOmyKdLJjngmUQovx
+        ssjfcprkgOMqpPW9BSus4m945OEWqQixk0saxT1MTL3do7oGSacT30jXZV9bowlV
+        COsZj+rR6IQkNYaZUWfYBPuHzEP3RN/J21F7T0KCi4q49CnkEwVsf6pnjFhIBuJ7
+        u+vKQ3Gq0Yro28SJs0leE8x3OA/WnLiJAgMBAAGjgacwgaQwHQYDVR0OBBYEFNL4
+        IU9fUeXBlqKwczeB3Pnup8qeMHUGA1UdIwRuMGyAFNL4IU9fUeXBlqKwczeB3Pnu
+        p8qeoUmkRzBFMQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8G
+        A1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkggkAv5egaqUg04swDAYDVR0T
+        BAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAMgANBnQbsgs9Yr0wSG1jD4w/pM90
+        y7MkLjstmOC5u9kHihWk3KDoI4Bx0fXD9wbyhP/E9AikqG7SglkuViRCrtWDprEp
+        8kTGbPG8sPjiu2cnmG19QcmL4HHHaG76r75qEggPu2wRGlEj0BR2zwOuINHCjfgz
+        Zi8Gl/4jRAazOcXmFfnNy/RXVOwswWQOG7aKbhHWCODn7jobT95wVTouEppUw7p9
+        twzPSzG7vudrmO3PSgAT+db/xrDRoHa3xk5H3fltZi7uxpRaWPqsFDezDYul4C8b
+        9JpGUkpLi0wGcVfceVLiZooxVGIQTFJj8Yu6fnTM2ZbD0xwFDyrYM92uWg==
+        -----END CERTIFICATE-----
+  hm:
+    http: {user: admin, password: admin-password, port: 25923}
+    director_account: {user: admin, password: admin}
+    resurrector_enabled: true
+
+  # cpi job template
+  cpi:
+    host_ip: 10.254.50.4
+    warden:
+      connect_network: tcp
+      connect_address: 127.0.0.1:7777
+    agent:
+      mbus: nats://nats:nats-password@10.254.50.4:4222
+      blobstore:
+        provider: dav
+        options:
+          endpoint: http://10.254.50.4:25251
+          user: agent
+          password: agent-password
+
+  # warden job template
+  warden:
+    listen_network: tcp
+    listen_address: 0.0.0.0:7777
+    network_pool: 10.244.0.0/16 # bosh-lite v1 used this pool
+    disk_quota_enabled: false
+    kernel_network_tuning_enabled: false

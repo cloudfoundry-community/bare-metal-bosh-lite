@@ -1,0 +1,10 @@
+#!/bin/bash
+
+bundle install
+
+if [[ ! $(vagrant plugin list | grep vagrant-bosh) ]]; then
+	vagrant plugin install vagrant-bosh
+fi
+if [[ ! $(vagrant plugin list | grep vagrant-managed-servers) ]]; then
+	vagrant plugin install vagrant-managed-servers
+fi
