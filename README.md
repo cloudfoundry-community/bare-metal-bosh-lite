@@ -1,4 +1,4 @@
-# Bosh-lite on bare-metal with knife solo
+# Bosh-lite on bare-metal with [bosh-provisioner](https://github.com/cppforlife/bosh-provisioner)
 
 This guide assumes you have already installed [Ubuntu Server 12.04 LTS (64-bit)](http://releases.ubuntu.com/12.04.4/) or later on your box.
 And have correctly configured passwordless ssh access to the `vcap` user with passwordless sudo.
